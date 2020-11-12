@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dorothy
+spec:
+  containers:
+   - name: dorothy
+     image: hazebooth/dorothy:0.0.3
+     env:
+     - name: DISCORD_TOKEN
+       valueFrom:
+         secretKeyRef:
+           name: dorothy-tokens
+           key: DISCORD_TOKEN
+     - name: GPT3_TOKEN
+       valueFrom:
+         secretKeyRef:
+           name: dorothy-tokens
+           key: GPT3_TOKEN

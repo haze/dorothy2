@@ -1,0 +1,16 @@
+[package]
+name = "dorothy"
+version = "0.0.1"
+authors = ["haze <isnt@haze.cool>"]
+edition = "2018"
+
+[dependencies]
+tokio = { version = "0.2.22", features = ["macros", "rt-threaded", "time", "sync"] }
+serenity = "0.9.0-rc.2"
+futures = "0.3.5"
+dotenv = "0.15.0"
+surf = "2.0.0-alpha.7"
+serde = { version = "1.0.116", features = ["derive"]}
+thiserror = "1.0.20"
+serde_json = "1.0.58"
+rust-bert = "0.11.0"
