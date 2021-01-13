@@ -77,8 +77,13 @@ async fn enable(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         let mut session_map_write = session_map.write().await;
         let session_name: String = args.single()?;
         let session = match &*session_name.to_lowercase() {
-            // "gpt2" => {}
-            "gpt3" => crate::gpt3::GPT3MessageHandler::enable(ctx, msg, args).await?,
+            "gpt2" => crate::gpt2::GPT2MessageHandler::enable(ctx, msg, args).await?,
+            "gpt3" => {
+                if msg.guild_id.is_none() || msg.guild_id.unwrap() != 394151608822398976 {
+                    return Err(StringError::from("GPT3 is not enabled for this guild").into());
+                }
+                crate::gpt3::GPT3MessageHandler::enable(ctx, msg, args).await?
+            }
             _ => {
                 return Err(StringError(format!(
                     "No complection engine found for {}",

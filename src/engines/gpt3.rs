@@ -1,4 +1,4 @@
-/// This file is the preferred interface for GPT3
+/// This file is the preferred interface for remote GPT3
 use crate::{
     transformers::{
         self,
@@ -160,8 +160,8 @@ impl GPT3MessageHandler {
 }
 
 pub struct Payload {
-    token: String,
-    channel_id: ChannelId,
+    pub token: String,
+    pub channel_id: ChannelId,
 }
 
 #[serenity::async_trait]
@@ -201,6 +201,14 @@ impl super::MessageSessionHandler for GPT3MessageHandler {
                             true,
                         )
                         .field(
+                            "top_p",
+                            config
+                                .top_p
+                                .map(|val| val.to_string())
+                                .unwrap_or_else(|| String::from("None")),
+                            true,
+                        )
+                        .field(
                             "presence_penalty",
                             config
                                 .presence_penalty
@@ -230,7 +238,7 @@ impl super::MessageSessionHandler for GPT3MessageHandler {
         Ok(())
     }
 
-    async fn on_message(&mut self, http: &serenity::http::Http, payload: Self::Payload) {
+    async fn perform_work(&mut self, http: &serenity::http::Http, payload: Self::Payload) {
         match self
             .get_response(&*payload.token, self.configuration.clone())
             .await

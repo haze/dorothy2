@@ -11,7 +11,7 @@ use serenity::{
 pub trait MessageSessionHandler {
     type Payload;
 
-    async fn on_message(&mut self, http: &serenity::http::Http, payload: Self::Payload);
+    async fn perform_work(&mut self, http: &serenity::http::Http, payload: Self::Payload);
     async fn info(&self, ctx: &Context, msg: &Message, args: Args) -> CommandResult;
     async fn enable(ctx: &Context, msg: &Message, args: Args) -> Result<Session, CommandError>;
     async fn reset(&mut self, ctx: &Context, msg: &Message, args: Args) -> CommandResult;

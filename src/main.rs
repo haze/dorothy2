@@ -7,8 +7,8 @@ mod engines;
 mod error;
 mod transformers;
 
+use engines::MessageSessionHandler;
 pub use engines::*;
-
 use serenity::{
     framework::{
         standard::{Args, CommandResult},
@@ -144,12 +144,22 @@ async fn timeout_task(mut payload: TimeoutTaskPayload) {
     }
 
     let mut session_map_write = payload.session_map.write().await;
-    let session = if let Some(session) = session_map_write.get_mut(&payload.chat_target) {
+    let mut session = if let Some(mut session) = session_map_write.get_mut(&payload.chat_target) {
         session
     } else {
         eprintln!("Failed to find session in map after timeout");
         return;
     };
+    match session {
+        Session::GPT2(session) => {}
+        Session::GPT3(session) => {
+            let gpt3_payload = gpt3::Payload {
+                token: payload.gpt3_token.clone(),
+                channel_id: payload.channel_id,
+            };
+            session.perform_work(&http, gpt3_payload).await;
+        }
+    }
 }
 
 struct TimeoutTaskPayload {
@@ -273,8 +283,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     // 1. get discord and gpt3 keys from environment
     let discord_token =
         std::env::var("DISCORD_TOKEN").expect("Could not find discord token in environment");
-    let gpt3_token =
-        std::env::var("GPT33_TOKEN").expect("Could not find gpt33 token in environment");
+    let gpt3_token = std::env::var("GPT3_TOKEN").expect("Could not find gpt3 token in environment");
 
     let http = Http::new_with_token(&discord_token);
 
